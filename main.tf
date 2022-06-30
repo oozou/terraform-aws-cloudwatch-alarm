@@ -1,3 +1,6 @@
+# namespace -> https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html
+# metric_name -> in Documentation section
+
 resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_name        = local.name
   alarm_description = var.alarm_description
