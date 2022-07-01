@@ -2,7 +2,7 @@
 # metric_name -> in Documentation section
 
 resource "aws_cloudwatch_metric_alarm" "this" {
-  alarm_name        = local.name
+  alarm_name        = format("%s-alarm", local.name)
   alarm_description = var.alarm_description
   actions_enabled   = var.actions_enabled
 
@@ -54,5 +54,5 @@ resource "aws_cloudwatch_metric_alarm" "this" {
     }
   }
 
-  tags = merge(local.tags, { "Name" = local.name })
+  tags = merge(local.tags, { "Name" = format("%s-alarm", local.name) })
 }
