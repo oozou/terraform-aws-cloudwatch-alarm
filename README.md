@@ -43,6 +43,15 @@ module "step_alarm" {
 ## Usage for complex query
 
 ```terrraform
+locals {
+  comparison_operators = {
+    ">=" = "GreaterThanOrEqualToThreshold",
+    ">"  = "GreaterThanThreshold",
+    "<"  = "LessThanThreshold",
+    "<=" = "LessThanOrEqualToThreshold",
+  }
+}
+
 module "alarm" {
   source = "git@github.com:oozou/terraform-aws-cloudwatch-alarm.git?ref=<version>"
 
