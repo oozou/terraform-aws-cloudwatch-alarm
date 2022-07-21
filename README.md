@@ -60,13 +60,16 @@ module "alarm" {
   name        = "kafka-cpu-reach"
 
   comparison_operator = local.comparison_operators[">="]
-  evaluation_periods  = 1
-  metric_name         = null
-  namespace           = null
-  period              = null
-  statistic           = null
   threshold           = "85"
-  dimensions          = null
+  evaluation_periods  = 1
+
+  # Conflict with metric_query
+  metric_name = null
+  namespace   = null
+  period      = null
+  statistic   = null
+  dimensions  = null
+
   metric_query = [
     {
       id          = "e1"
