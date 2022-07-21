@@ -1,6 +1,6 @@
 # terraform-aws-cloudwatch
 
-## usage
+## Usage simeple usecase
 
 ```terraform
 locals {
@@ -27,6 +27,7 @@ module "step_alarm" {
   statistic           = "Average"
   threshold           = "80"
 
+  # Take care of putting this dimension some services are use `"Cluster Name"` = var.cluster_name
   dimensions = {
     ClusterName = var.ecs_cluster_name
     ServiceName = local.service_name
@@ -35,6 +36,71 @@ module "step_alarm" {
   alarm_actions = ["arn-of-the-action"]
 
   tags = {"Workspace" = "xxx-yyy-zzz"}
+}
+
+```
+
+## Usage for complex query
+
+```terrraform
+module "alarm" {
+  source = "git@github.com:oozou/terraform-aws-cloudwatch-alarm.git?ref=<version>"
+
+  prefix      = "oozou"
+  environment = "devops"
+  name        = "kafka-cpu-reach"
+
+  comparison_operator = local.comparison_operators[">="]
+  evaluation_periods  = 1
+  metric_name         = null
+  namespace           = null
+  period              = null
+  statistic           = null
+  threshold           = "85"
+  dimensions          = null
+  metric_query = [
+    {
+      id          = "e1"
+      expression  = "m1+m2"
+      label       = "CPUSummation"
+      return_data = "true"
+      metric      = []
+    },
+    {
+      id = "m1"
+      metric = [
+        {
+          metric_name = "CpuUser"
+          namespace   = "AWS/Kafka"
+          period      = "60"
+          stat        = "Maximum"
+          dimensions = {
+            "Cluster Name" = "oozou-devops-demo-msk"
+            "Broker ID"    = "1"
+          }
+        }
+      ]
+    },
+    {
+      id = "m2"
+      metric = [
+        {
+          metric_name = "CpuSystem"
+          namespace   = "AWS/Kafka"
+          period      = "60"
+          stat        = "Maximum"
+          dimensions = {
+            "Cluster Name" = "oozou-devops-demo-msk"
+            "Broker ID"    = "1"
+          }
+        }
+      ]
+    }
+  ]
+
+  alarm_actions = ["arn-of-action"]
+
+  tags = { "Workspace" = "xxx-yyy-zzz" }
 }
 
 ```
