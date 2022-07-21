@@ -42,7 +42,7 @@ module "step_alarm" {
 
 ## Usage for complex query
 
-```terrraform
+```terraform
 locals {
   comparison_operators = {
     ">=" = "GreaterThanOrEqualToThreshold",
