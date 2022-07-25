@@ -27,7 +27,6 @@ module "step_alarm" {
   statistic           = "Average"
   threshold           = "80"
 
-  # Take care of putting this dimension some services are use `"Cluster Name"` = var.cluster_name
   dimensions = {
     ClusterName = var.ecs_cluster_name
     ServiceName = local.service_name
