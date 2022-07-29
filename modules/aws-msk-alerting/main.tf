@@ -20,7 +20,8 @@ locals {
   is_contain_disk_high = contains(var.enabled_cloudwatch_alarms, "disk_high")
   is_contain_heap_high = contains(var.enabled_cloudwatch_alarms, "heap_high")
   broker_ids           = [for node in data.aws_msk_broker_nodes.this.node_info_list : node.broker_id]
-  enabled_cloudwatch_alarms = concat(keys(var.additional_cloudwatch_alarms),
+  enabled_cloudwatch_alarms = concat(
+    keys(var.additional_cloudwatch_alarms),
     local.is_contain_cpu_high ? [for broker_id in local.broker_ids : format("cpu_high_broker_%s", broker_id)] : [],
     local.is_contain_disk_high ? [for broker_id in local.broker_ids : format("disk_high_broker_%s", broker_id)] : [],
     local.is_contain_heap_high ? [for broker_id in local.broker_ids : format("heap_high_broker_%s", broker_id)] : []
