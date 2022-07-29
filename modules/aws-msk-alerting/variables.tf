@@ -12,7 +12,7 @@ variable "environment" {
 }
 
 variable "name" {
-  description = "Name of the ECS cluster to create"
+  description = "Name alarm"
   type        = string
 }
 

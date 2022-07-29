@@ -22,8 +22,8 @@ locals {
   broker_ids           = [for node in data.aws_msk_broker_nodes.this.node_info_list : node.broker_id]
   enabled_cloudwatch_alarms = concat(keys(var.additional_cloudwatch_alarms),
     local.is_contain_cpu_high ? [for broker_id in local.broker_ids : format("cpu_high_broker_%s", broker_id)] : [],
-    local.is_contain_disk_high ? [for broker_id in local.broker_ids : format("disk_high_%s", broker_id)] : [],
-    local.is_contain_heap_high ? [for broker_id in local.broker_ids : format("heap_high_%s", broker_id)] : []
+    local.is_contain_disk_high ? [for broker_id in local.broker_ids : format("disk_high_broker_%s", broker_id)] : [],
+    local.is_contain_heap_high ? [for broker_id in local.broker_ids : format("heap_high_broker_%s", broker_id)] : []
   )
 
   dimensions = { for broker_id in local.broker_ids : broker_id => {
@@ -73,7 +73,7 @@ locals {
     }
   }
 
-  disk_high_alarms = { for broker_id in local.broker_ids : format("disk_high_%s", broker_id) => {
+  disk_high_alarms = { for broker_id in local.broker_ids : format("disk_high_broker_%s", broker_id) => {
     namespace           = "AWS/Kafka"
     metric_name         = "KafkaDataLogsDiskUsed"
     statistic           = "Maximum"
@@ -86,7 +86,7 @@ locals {
     }
   }
 
-  heap_high_alarms = { for broker_id in local.broker_ids : format("heap_high_%s", broker_id) => {
+  heap_high_alarms = { for broker_id in local.broker_ids : format("heap_high_broker_%s", broker_id) => {
     namespace           = "AWS/Kafka"
     metric_name         = "HeapMemoryAfterGC"
     statistic           = "Maximum"
