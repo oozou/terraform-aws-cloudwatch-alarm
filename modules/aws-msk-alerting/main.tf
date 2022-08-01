@@ -16,6 +16,38 @@ locals {
 }
 
 locals {
+  cpu_high_alert = merge(
+    {
+      threshold          = 85
+      evaluation_periods = "1"
+      statistic          = "Maximum"
+      period             = "300"
+    },
+    var.override_cpu_high_alert
+  )
+
+  disk_high_alert = merge(
+    {
+      threshold          = 85
+      evaluation_periods = "1"
+      statistic          = "Maximum"
+      period             = "300"
+    },
+    var.override_disk_high_alert
+  )
+
+  heap_high_alert = merge(
+    {
+      threshold          = 60
+      evaluation_periods = "1"
+      statistic          = "Maximum"
+      period             = "300"
+    },
+    var.override_heap_high_alert
+  )
+}
+
+locals {
   is_contain_cpu_high  = contains(var.enabled_cloudwatch_alarms, "cpu_high")
   is_contain_disk_high = contains(var.enabled_cloudwatch_alarms, "disk_high")
   is_contain_heap_high = contains(var.enabled_cloudwatch_alarms, "heap_high")
@@ -46,8 +78,8 @@ locals {
         {
           metric_name = "CpuUser"
           namespace   = "AWS/Kafka"
-          period      = "300"
-          stat        = "Maximum"
+          period      = local.cpu_high_alert.period
+          stat        = local.cpu_high_alert.statistic
           dimensions  = local.dimensions[broker_id]
         }
       ]
@@ -58,8 +90,8 @@ locals {
         {
           metric_name = "CpuSystem"
           namespace   = "AWS/Kafka"
-          period      = "300"
-          stat        = "Maximum"
+          period      = local.cpu_high_alert.period
+          stat        = local.cpu_high_alert.statistic
           dimensions  = local.dimensions[broker_id]
         }
       ]
@@ -67,8 +99,8 @@ locals {
   ] }
   cpu_high_alarms = { for broker_id, metric_query in local.metric_query_cpu_high_alarms : format("cpu_high_%s", broker_id) => {
     "comparison_operator" : ">="
-    "evaluation_periods" : "1"
-    "threshold" : "60"
+    "evaluation_periods" : local.cpu_high_alert.evaluation_periods
+    "threshold" : local.cpu_high_alert.threshold
     "alarm_actions" : []
     "metric_query" : metric_query
     }
@@ -77,11 +109,11 @@ locals {
   disk_high_alarms = { for broker_id in local.broker_ids : format("disk_high_broker_%s", broker_id) => {
     namespace           = "AWS/Kafka"
     metric_name         = "KafkaDataLogsDiskUsed"
-    statistic           = "Maximum"
+    statistic           = local.disk_high_alert.statistic
     comparison_operator = ">="
-    threshold           = "85"
-    period              = "300"
-    evaluation_periods  = "1"
+    threshold           = local.disk_high_alert.threshold
+    period              = local.disk_high_alert.period
+    evaluation_periods  = local.disk_high_alert.evaluation_periods
     dimensions          = local.dimensions[broker_id]
     alarm_actions       = []
     }
@@ -90,11 +122,11 @@ locals {
   heap_high_alarms = { for broker_id in local.broker_ids : format("heap_high_broker_%s", broker_id) => {
     namespace           = "AWS/Kafka"
     metric_name         = "HeapMemoryAfterGC"
-    statistic           = "Maximum"
+    statistic           = local.heap_high_alert.statistic
     comparison_operator = ">="
-    threshold           = "60"
-    period              = "300"
-    evaluation_periods  = "1"
+    threshold           = local.heap_high_alert.threshold
+    period              = local.heap_high_alert.period
+    evaluation_periods  = local.heap_high_alert.evaluation_periods
     dimensions          = local.dimensions[broker_id]
     alarm_actions       = []
     }

@@ -60,3 +60,22 @@ variable "default_alarm_actions" {
   type        = list(string)
   default     = []
 }
+
+/* ------------------------ Set Default Module Alert ------------------------ */
+variable "override_cpu_high_alert" {
+  description = "Key value to override default configuration; possible keys: {threshold, evaluation_periods, statistic, period}"
+  type        = map(any)
+  default     = {}
+}
+
+variable "override_disk_high_alert" {
+  description = "Key value to override default configuration; possible keys: {threshold, evaluation_periods, statistic, period}"
+  type        = map(any)
+  default     = {}
+}
+
+variable "override_heap_high_alert" {
+  description = "Key value to override default configuration; possible keys: {threshold, evaluation_periods, statistic, period}"
+  type        = map(any)
+  default     = {}
+}
