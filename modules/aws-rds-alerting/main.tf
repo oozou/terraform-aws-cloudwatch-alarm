@@ -20,9 +20,6 @@ locals {
 locals {
   aws_rds_namespace    = "AWS/RDS"
   custom_rds_namespace = "RDSInfo"
-  dimensions = {
-    "DBInstanceIdentifier" = var.db_instance_identifier
-  }
 
   cpu_high_alert = merge(
     {
@@ -49,13 +46,12 @@ locals {
     {
       cpu_high = {
         metric_name         = "CPUUtilization"
-        namespace           = local.aws_rds_namespace
+        namespace           = local.custom_rds_namespace
         comparison_operator = ">="
         threshold           = local.cpu_high_alert.threshold
         evaluation_periods  = local.cpu_high_alert.evaluation_periods
         statistic           = local.cpu_high_alert.statistic
         period              = local.cpu_high_alert.period
-        dimensions          = local.dimensions
       }
       mem_high = {
         comparison_operator = ">="
@@ -110,9 +106,24 @@ locals {
   )
 }
 
-# data "aws_db_instance" "this" {
-#   db_instance_identifier = var.db_instance_identifier
-# }
+data "aws_db_instance" "this" {
+  db_instance_identifier = var.db_instance_identifier
+}
+
+resource "aws_cloudwatch_log_metric_filter" "cpu_usage" {
+  count = contains(local.enabled_cloudwatch_alarms, "cpu_high") && !contains(keys(var.additional_cloudwatch_alarms), "cpu_high") ? 1 : 0
+
+  name           = format("%s-cpu-utilization", local.name)
+  pattern        = "{$.instanceID = \"${var.db_instance_identifier}\"}"
+  log_group_name = "RDSOSMetrics"
+
+  metric_transformation {
+    name      = "CPUUtilization"
+    namespace = local.custom_rds_namespace
+    value     = "$.cpuUtilization.total"
+    unit      = "Percent"
+  }
+}
 
 resource "aws_cloudwatch_log_metric_filter" "total_mem" {
   count = contains(local.enabled_cloudwatch_alarms, "mem_high") && !contains(keys(var.additional_cloudwatch_alarms), "mem_high") ? 1 : 0
