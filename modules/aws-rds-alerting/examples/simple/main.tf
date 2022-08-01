@@ -1,4 +1,4 @@
-module "kafka_alerting" {
+module "rds_alerting" {
   source = "../../"
 
   prefix      = var.prefix
